@@ -7,5 +7,11 @@ This test will try to activate the carrier signal
 Install serial 
 
 ```
-pip install serial
+pip install pyserial
+```
+
+## Run
+
+```
+python test.py
 ```
