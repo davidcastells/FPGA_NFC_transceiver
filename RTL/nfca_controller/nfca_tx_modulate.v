@@ -27,8 +27,8 @@ initial tx_req  = 1'b0;
 initial carrier_out = 1'b0;
 initial rx_on = 1'b0;
 
-reg [ 1:0] clkcnt = 2'd0;
-reg [ 7:0] ccnt = 8'd0;
+reg [ 1:0] clkcnt = 2'd0;					// 2 bit counter (to 3) for the clock divider to create the carrier frequency from the fast clock
+reg [ 7:0] ccnt = 8'd0;						// 8 bit counter for the higher part of the clock divider
 reg [31:0] wcnt = 32'hFFFFFFFF;
 reg [ 1:0] bdata = 2'd0;            // {1 bits for future, 1 bit for current, 1 bit for past}
 
@@ -51,7 +51,7 @@ always @ (posedge clk or negedge rstn)
     if(~rstn)
         tx_req <= 1'b0;
     else
-        tx_req <= clkcnt == 2'h0 && ccnt == 8'hff && (wcnt == CARRIER_SETUP || wcnt >= CARRIER_SETUP*2 && wcnt <= CARRIER_SETUP*2 + CARRIER_HOLD || wcnt > CARRIER_SETUP*2 + CARRIER_HOLD + 16);
+        tx_req <= (clkcnt == 2'h0) && (ccnt == 8'hff) && (wcnt == CARRIER_SETUP || wcnt >= CARRIER_SETUP*2 && wcnt <= CARRIER_SETUP*2 + CARRIER_HOLD || wcnt > CARRIER_SETUP*2 + CARRIER_HOLD + 16);
 
 
 always @ (posedge clk or negedge rstn)
