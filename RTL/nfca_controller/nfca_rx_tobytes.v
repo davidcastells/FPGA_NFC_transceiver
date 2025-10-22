@@ -11,14 +11,17 @@ module nfca_rx_tobytes (
     input  wire       clk,           // require 81.36MHz
     // RX on/off control
     input  wire       rx_on,         // 0:off, 1:on
-    // indicate how many bits remain for an incomplete byte for PICC to send
+    
+	 // indicate how many bits remain for an incomplete byte for PICC to send
     input  wire [2:0] remainb,
+	 
     // RX bit parsed (105.9375 kbps base-band)
     input  wire       rx_bit_en,     // when rx_bit_en=1 pulses, a received bit is valid on rx_bit
     input  wire       rx_bit,        // exclude S (start of communication) and E (end of communication)
     input  wire       rx_end,        // end of a communication pulse, because of detect E, or detect a bit collision, or detect an error.
     input  wire       rx_end_col,    // indicate a bit collision, only valid when rx_end=1
     input  wire       rx_end_err,    // indicate an unknown error, such a PICC (card) do not match ISO14443A, or noise, or PICC's frame is too long. Only valid when rx_end=1
+	 
     // RX byte parsed
     output reg        rx_tvalid,
     output reg  [7:0] rx_tdata,
@@ -56,6 +59,7 @@ always @ (posedge clk or negedge rstn)
             cnt <= {1'b0, remainb};
             byte_saved <= 0;
             status <= IDLE;
+				
             if(status == START || status == PARSE)
                 {rx_tvalid, rx_tdata, rx_tdatab, rx_tend, rx_terr}     <= {1'b1, byte_saved, cnt, 1'b1, 1'b1};
         end else if(status == IDLE) begin
@@ -73,7 +77,7 @@ always @ (posedge clk or negedge rstn)
                 end
             end else if(rx_end) begin
                 status <= rx_end_col ? CSTOP : STOP;
-                if(rx_end_col)
+                if (rx_end_col)
                     {rx_tvalid, rx_tdata, rx_tdatab, rx_tend, rx_terr} <= {1'b1, byte_saved, cnt, 1'b0, 1'b0};   // end with collision
                 else if(rx_end_err | (|cnt) )
                     {rx_tvalid, rx_tdata, rx_tdatab, rx_tend, rx_terr} <= {1'b1, byte_saved, cnt, 1'b1, 1'b1};   // end with error
