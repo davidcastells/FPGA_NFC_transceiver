@@ -12,7 +12,7 @@ module nfca_controller (
     // TX byte stream interface for NFC PCD-to-PICC (axis sink liked)
     input  wire       tx_tvalid,
     output wire       tx_tready,
-    input  wire [7:0] tx_tdata,
+    input  wire [7:0] tx_tdata,			// data to send to the antenna
     input  wire [3:0] tx_tdatab,      // indicate how many bits are valid in the last byte. range=[1,8]. for the last byte of bit-oriented frame
     input  wire       tx_tlast,
     // RX status
@@ -46,6 +46,13 @@ wire       rx_end;        // end of a communication pulse, because of detect E, 
 wire       rx_end_col;    // indicate a bit collision, only valid when rx_end=1
 wire       rx_end_err;    // indicate an unknown error, such a PICC (card) do not match ISO14443A, or noise, only valid when rx_end=1
 
+//------------------------------------------------------------------------
+// 
+//             +---------------+              +------------------+
+//  tx_tdata-->| nfca_tx_frame |--> tx_bit -->| nfca_tx_modulate |
+//             +---------------+              +------------------+
+// 
+//------------------------------------------------------------------------
 
 nfca_tx_frame u_nfca_tx_frame (
     .rstn          ( rstn              ),
@@ -72,6 +79,13 @@ nfca_tx_modulate u_nfca_tx_modulate (
     .rx_on         ( rx_on             )
 );
 
+//------------------------------------------------------------------------
+// 
+// +-------------+                +-----------------+                +------------------+
+// | nfca_rx_dsp | --> rx_ask --> | nfca_rx_to_bits | --> rx_bit --> | nfca_rx_to_bytes | --> rx_tdata
+// |             |                |                 |                |                  | --> tx_err
+// +-------------+                +-----------------+                +------------------+
+//
 
 nfca_rx_dsp u_nfca_rx_dsp (
     .rstn          ( rstn              ),
