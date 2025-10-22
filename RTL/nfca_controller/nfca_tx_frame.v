@@ -64,7 +64,7 @@ always @ (posedge clk)
     if(tx_tready & tx_tvalid)
         buffer[wptr] <= tx_tdata;
 
-
+// Main FSM 
 always @ (posedge clk or negedge rstn)
     if(~rstn) begin
         tx_tready <= 0;
