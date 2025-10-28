@@ -31,6 +31,7 @@ module nfca_controller (
 );
 
 wire [2:0] remainb;
+wire carrier_freq;
 
 wire       tx_req;
 wire       tx_en;
@@ -76,6 +77,7 @@ nfca_tx_modulate u_nfca_tx_modulate (
     .tx_en         ( tx_en             ),
     .tx_bit        ( tx_bit            ),
     .carrier_out   ( carrier_out       ),
+	 .carrier_freq (ccarrier_freq),
     .rx_on         ( rx_on             )
 );
 
