@@ -15,6 +15,7 @@ module nfca_tx_modulate (
     input  wire       tx_bit,
     // RFID carrier output, connect to a NMOS transistor to drive the antenna coil
     output reg        carrier_out,
+	 output reg			 carrier_freq,
     // 1:in RX window,  0:out of RX window
     output reg        rx_on
 );
@@ -37,10 +38,12 @@ always @ (posedge clk or negedge rstn)
     if(~rstn) begin
         clkcnt <= 2'd0;
         ccnt <= 8'd0;
+		  carrier_freq <= 0;
     end else begin
         if(clkcnt >= 2'd2) begin
             clkcnt <= 2'd0;
             ccnt <= ccnt + 8'h01;
+				carrier_freq  <= !carrier_freq ;
         end else begin
             clkcnt <= clkcnt + 2'd1;
         end
