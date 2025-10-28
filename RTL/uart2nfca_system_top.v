@@ -38,6 +38,14 @@ wire [3:0] rx_tdatab;
 wire       rx_tend;
 wire       rx_terr;
 
+//--------------------------------------------------------------
+// Receiver (from the NFC board) Path.
+// will be the Tx to the UART
+//
+//  +-----+                +-----------------+
+//  | ADC |--> adc_data -->| nfca_controller |
+//  +-----+                +-----------------+
+//--------------------------------------------------------------
 
 // ADC module that reads data from the ADC (using I2C) and delivers adc_data (12 bits sample)
 ad7276_read u_ad7276_read (
@@ -49,6 +57,16 @@ ad7276_read u_ad7276_read (
     .adc_data_en      ( adc_data_en                     ),
     .adc_data         ( adc_data                        )
 );
+
+//--------------------------------------------------------------
+// Transmitter Path (from the NFC board perspective) .
+// will be the Rx to the UART
+//
+//  +------+               +---------+                    +----------------+           +------+              +-----------------+
+//  | host |--> uart_rx -->| uart_rx |--> uart_rx_byte -->| uart_rx_parser |-->tdata-->| FIFO |-->tx_tdata-->| nfca_controller |
+//  | UART |               |         |                    |                |           |      |              |                 | 
+//  +------+               +---------+                    +----------------+           +------+              +-----------------+
+//--------------------------------------------------------------
 
 
 // UART Receiver of the messages from the host computer
